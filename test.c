@@ -15,10 +15,16 @@ int main(int argc, char const *argv[]) {
   int p1;
   int p2;
   int p3;
+  char *myArgs[3];
 
   p1 = fork();
 
   if (p1 == 0) { //child process
+  char *myargs[3];
+    myargs[0] = strdup("wc"); // program: "wc" (word count)
+    myargs[1] = strdup("test.txt"); // argument: file to count
+    myargs[2] = NULL; // marks end of array
+    execvp(myargs[0], myargs); // runs word count
     printf("Child process 1. PID = %d\n", getpid());
   } if (p1 > 0) { //parent process
     wait(NULL);
