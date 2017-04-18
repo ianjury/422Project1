@@ -62,9 +62,9 @@ the new processes (move to a new program) to improve speed.
 */
 void mash(char c1[], char c2[], char c3[], char file[]) {
   int status;
-  int p1 = 0;
-  int p2 = 0;
-  int p3 = 0;
+  int p1;
+  int p2;
+  int p3;
   p1 = fork();
 
   if (p1 == 0) { //child process 1. Do work
