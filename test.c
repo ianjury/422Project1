@@ -9,7 +9,7 @@ Project 1 -- MASH
 #include <string.h>
 #include <unistd.h>
 #include<sys/wait.h>
-#define SIZE 255
+
 
 int main(int argc, char const *argv[]) {
   int p1;
@@ -17,46 +17,54 @@ int main(int argc, char const *argv[]) {
   int p3;
   char *myArgs[3];
 
-  p1 = fork();
+  if ((p1 = fork()) < 0) {
+    printf("First fork failed.\n");
+  }
 
   if (p1 == 0) {  //child process 1
   char *myargs[3];
     myargs[0] = strdup("w c");
     myargs[1] = strdup("test.txt");
     myargs[2] = NULL;
-    if (execvp(myargs[0], myargs) == -1) {
+    if (execvp(myargs[0], myargs) == -1) {//test for invalid/execute
       printf("[SHELL 1] STATUS CODE = -1\n");
     }
   } if (p1 > 0) { //parent process 1
-    p2 = fork();
+    if ((p2 = fork()) < 0) {
+      printf("Second fork failed.\n");
+    }
 
     if (p2 == 0) { //child process 2
       char *myargs[3];
       myargs[0] = strdup("ls");
       myargs[1] = strdup("test.txt"); // argument: file to count
       myargs[2] = NULL; // marks end of array
-      if (execvp(myargs[0], myargs) == -1) {
+      if (execvp(myargs[0], myargs) == -1) {//test for invalid/execute
         printf("[SHELL 2] STATUS CODE = -1\n");
       }
-    } if (p2 > 0) { //parent process 2
-      p3 = fork();
+    }
+     if (p2 > 0) { //parent process 2
+      if ((p3 = fork()) < 0) {
+        printf("Third fork failed.\n");
+      }
 
       if (p3 == 0) {   // Child process 3
         char *myargs[3];
         myargs[0] = strdup("wc");
         myargs[1] = strdup("test.txt"); // argument: file to count
         myargs[2] = NULL; // marks end of array
-        if (execvp(myargs[0], myargs) == -1) {    //test for invalid/execute
+        if (execvp(myargs[0], myargs) == -1) {//test for invalid/execute
           printf("[SHELL 3] STATUS CODE = -1\n");
         }
       }
       if (p3 > 0) { //parent process 3
-        //wait for child to finish
+        //3rd waits for child to finish
         wait(NULL);
       }
+      //2nd waits for child to finish
       wait(NULL);
     }
-    //first parent waits for children
+    //1st parent waits for child to finish
     wait(NULL);
   }
   //prevents early execution if exec fails in 1+ case(s)
