@@ -70,22 +70,21 @@ void mash(char c1[], char c2[], char c3[], char file[]) {
     }
 
     if (p1 == 0) {  //child process 1
-        char *myargs[5]; //5 is max # of args - as specified
-        char *str =strtok(c1, " ");
-        int n = 0;
-        while(str) {
-            myargs[n] = strdup(str);
-            str = strtok(NULL, " ");
-            n++;
-    }
-        myargs[n+1] = NULL;
-      //myargs[0] = strdup("wc");
-      //myargs[1] = strdup("test.txt");
-      //myargs[2] = strdup("");
-      //myargs[2] = NULL;
-      if (execvp(myargs[0], myargs) == -1) {//test for invalid/execute
-        printf("[SHELL 1] STATUS CODE = -1\n");
-      }
+        if (c1[0] != 0) { //if a command was given to this one
+            char *myargs[5]; //5 is max # of args - as specified
+            char *str =strtok(c1, " ");
+            int n = 0;
+            while(str) {
+                myargs[n] = strdup(str);
+                str = strtok(NULL, " ");
+                n++;
+            }
+            myargs[n+1] = NULL;
+            //test for invalid/execute
+            if (execvp(myargs[0], myargs) == -1) {
+                printf("[SHELL 1] STATUS CODE = -1\n");
+            }
+        }
     }
     if (p1 > 0) { //parent process 1
       if ((p2 = fork()) < 0) {
