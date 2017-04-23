@@ -82,7 +82,7 @@ void mash(char c1[], char c2[], char c3[], char file[]) {
 
     if (p1 == 0) {  //child process 1
         if (c1[0] != 0) { //if a command was given to this one
-            char *myargs[5]; //5 is max # of args - as specified
+            char *myargs[8]; //5 is max # of args - as specified
             char *str =strtok(c1, " ");
             int n = 0;
             while(str != NULL) {
@@ -106,7 +106,7 @@ void mash(char c1[], char c2[], char c3[], char file[]) {
 
       if (p2 == 0) { //child process 2
           if (c2[0] != 0) { //if a command was given to this one
-              char *myargs[5]; //5 is max # of args - as specified
+              char *myargs[8]; //5 is max # of args - as specified
               char *str =strtok(c2, " ");
               int n = 0;
               while(str != NULL) {
@@ -129,7 +129,7 @@ void mash(char c1[], char c2[], char c3[], char file[]) {
 
         if (p3 == 0) {   // Child process 3
             if (c3[0] != 0) { //if a command was given to this one
-                char *myargs[5]; //5 is max # of args - as specified
+                char *myargs[8]; //5 is max # of args - as specified
                 char *str =strtok(c3, " ");
                 int n = 0;
                 while(str) {
