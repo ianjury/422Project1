@@ -79,7 +79,8 @@ void mash(char c1[], char c2[], char c3[], char file[]) {
                 str = strtok(NULL, " ");
                 n++;
             }
-            myargs[n+1] = NULL;
+            myargs[n+1] = strdup(file);
+            myargs[n+2] = NULL;
             //test for invalid/execute
             if (execvp(myargs[0], myargs) == -1) {
                 printf("[SHELL 1] STATUS CODE = -1\n");
@@ -92,13 +93,23 @@ void mash(char c1[], char c2[], char c3[], char file[]) {
       }
 
       if (p2 == 0) { //child process 2
-        char *myargs[3];
-        myargs[0] = strdup("ls");
-        myargs[1] = strdup("test.txt"); // argument: file to count
-        myargs[2] = NULL; // marks end of array
-        if (execvp(myargs[0], myargs) == -1) {//test for invalid/execute
-          printf("[SHELL 2] STATUS CODE = -1\n");
-        }
+          if (c2[0] != 0) { //if a command was given to this one
+              char *myargs[5]; //5 is max # of args - as specified
+              char *str =strtok(c2, " ");
+              int n = 0;
+              while(str != NULL) {
+                  myargs[n] = strdup(str);
+                  str = strtok(NULL, " ");
+                  n++;
+              }
+              myargs[n+1] = strdup(file);
+              myargs[n+2] = NULL;
+              printf("%s\n", *myargs);
+              //test for invalid/execute
+              if (execvp(myargs[0], myargs) == -1) {
+                  printf("[SHELL 2] STATUS CODE = -1\n");
+              }
+          }
       }
        if (p2 > 0) { //parent process 2
         if ((p3 = fork()) < 0) {
@@ -106,13 +117,22 @@ void mash(char c1[], char c2[], char c3[], char file[]) {
         }
 
         if (p3 == 0) {   // Child process 3
-          char *myargs[3];
-          myargs[0] = strdup("wc");
-          myargs[1] = strdup("test.txt"); // argument: file to count
-          myargs[2] = NULL; // marks end of array
-          if (execvp(myargs[0], myargs) == -1) {//test for invalid/execute
-            printf("[SHELL 3] STATUS CODE = -1\n");
-          }
+            if (c3[0] != 0) { //if a command was given to this one
+                char *myargs[5]; //5 is max # of args - as specified
+                char *str =strtok(c3, " ");
+                int n = 0;
+                while(str) {
+                    myargs[n] = strdup(str);
+                    str = strtok(NULL, " ");
+                    n++;
+                }
+                myargs[n+1] = strdup(file);
+                myargs[n+2] = NULL;
+                //test for invalid/execute
+                if (execvp(myargs[0], myargs) == -1) {
+                    printf("[SHELL 3] STATUS CODE = -1\n");
+                }
+            }
         }
         if (p3 > 0) { //parent process 3
           //3rd waits for child to finish
