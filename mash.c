@@ -8,7 +8,7 @@ Project 1 -- MASH
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include<sys/wait.h>
+#include <sys/wait.h>
 #define SIZE 255
 
 void mash(char c1[], char c2[], char c3[], char file[]);
@@ -61,49 +61,64 @@ on the file. Fork is used to split the processes and then exec is used to run
 the new processes (move to a new program) to improve speed.
 */
 void mash(char c1[], char c2[], char c3[], char file[]) {
-  int status;
-  int p1;
-  int p2;
-  int p3;
-  p1 = fork();
+    int p1;
+    int p2;
+    int p3;
 
-  if (p1 == 0) { //child process 1. Do work
-    if (c1[0] != 0) { //if a command was given to this one
-      strcat(c1, " ");
-      strcat(c1, file);
-      system(c1);
-    } else {
-      printf("No command given for 1\n");
+    if ((p1 = fork()) < 0) {
+      printf("First fork failed.\n");
     }
-  }
-  if (p1 > 0) { //parent process 1. Make more children
-    p2 = fork();
-    if ( p2 == 0) { //child process 2. Do work.
-      if (c2[0] != 0) { //if a command was given to this one
-        strcat(c2, " ");
-        strcat(c2, file);
-        system(c2);
+
+    if (p1 == 0) {  //child process 1
+    char *myargs[4];
+      myargs[0] = strdup("wc");
+      myargs[1] = strdup("test.txt");
+      //myargs[2] = strdup("");
+      myargs[2] = NULL;
+      if (execvp(myargs[0], myargs) == -1) {//test for invalid/execute
+        printf("[SHELL 1] STATUS CODE = -1\n");
       }
     }
-    if (p1 > 0) { //parent process 2. Make another child.
-      p3 = fork();
-      if (p3 == 0) {    //cild process 3. Do work
-        if (c3[0] != 0) { //if a command was given to this one
-          strcat(c3, " ");
-          strcat(c3, file);
-          system(c3);
+    if (p1 > 0) { //parent process 1
+      if ((p2 = fork()) < 0) {
+        printf("Second fork failed.\n");
+      }
+
+      if (p2 == 0) { //child process 2
+        char *myargs[3];
+        myargs[0] = strdup("ls");
+        myargs[1] = strdup("test.txt"); // argument: file to count
+        myargs[2] = NULL; // marks end of array
+        if (execvp(myargs[0], myargs) == -1) {//test for invalid/execute
+          printf("[SHELL 2] STATUS CODE = -1\n");
         }
       }
-      if (p3 > 0) { //final parent process. Wait.
-        //wait(&status);
+       if (p2 > 0) { //parent process 2
+        if ((p3 = fork()) < 0) {
+          printf("Third fork failed.\n");
+        }
+
+        if (p3 == 0) {   // Child process 3
+          char *myargs[3];
+          myargs[0] = strdup("wc");
+          myargs[1] = strdup("test.txt"); // argument: file to count
+          myargs[2] = NULL; // marks end of array
+          if (execvp(myargs[0], myargs) == -1) {//test for invalid/execute
+            printf("[SHELL 3] STATUS CODE = -1\n");
+          }
+        }
+        if (p3 > 0) { //parent process 3
+          //3rd waits for child to finish
+          wait(NULL);
+        }
+        //2nd waits for child to finish
+        wait(NULL);
       }
+      //1st parent waits for child to finish
+      wait(NULL);
     }
-    wait(NULL);
-    //printf("Done waiting on children %d %d %d", p1, p2, getpid());
-    exit(1);
-  }
-
-
-
-
+    //prevents early execution if exec fails in 1+ case(s)
+    if (p1 != 0 && p2 != 0 && p3 != 0) {
+        printf("Done waiting on children: %d %d %d\n", p1, p2, p3);
+    }
 }

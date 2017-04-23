@@ -8,7 +8,7 @@ Project 1 -- MASH
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include<sys/wait.h>
+#include <sys/wait.h>
 
 
 int main(int argc, char const *argv[]) {
@@ -22,9 +22,10 @@ int main(int argc, char const *argv[]) {
   }
 
   if (p1 == 0) {  //child process 1
-  char *myargs[3];
-    myargs[0] = strdup("w c");
+  char *myargs[4];
+    myargs[0] = strdup("wc");
     myargs[1] = strdup("test.txt");
+    //myargs[2] = strdup("");
     myargs[2] = NULL;
     if (execvp(myargs[0], myargs) == -1) {//test for invalid/execute
       printf("[SHELL 1] STATUS CODE = -1\n");
