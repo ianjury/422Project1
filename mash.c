@@ -18,7 +18,8 @@ int main(int argc, char const *argv[]) {
   char command2[SIZE];    //second
   char command3[SIZE];    //third
   char fileName[SIZE];    //name of file to process
-  char buffer[SIZE];
+  int i;
+  char c;
 
   //for testing later, to see if any input was given to a command.
   command1[0] = 0;
@@ -27,8 +28,7 @@ int main(int argc, char const *argv[]) {
 
   //get first command
   printf("mash-1>");
-  int i = 0;
-  char c;
+  i = 0;
   while ((c=fgetc(stdin)) != '\n') {
     command1[i++] = c;
   }
@@ -38,21 +38,27 @@ int main(int argc, char const *argv[]) {
 
   //get second command
   printf("mash-2>");
-  if (fgets(buffer, sizeof buffer, stdin) != NULL) {
-    sscanf(buffer, "%s", command2);
+  i = 0;
+  while ((c=fgetc(stdin)) != '\n') {
+    command2[i++] = c;
   }
+  command2[i] = '\0';
 
   //get third command
   printf("mash-3>");
-  if (fgets(buffer, sizeof buffer, stdin) != NULL) {
-    sscanf(buffer, "%s", command3);
+  i = 0;
+  while ((c=fgetc(stdin)) != '\n') {
+    command3[i++] = c;
   }
+  command3[i] = '\0';
 
   //get file name
   printf("file>");
-  if (fgets(buffer, sizeof buffer, stdin) != NULL) {
-    sscanf(buffer, "%s", fileName);
+  i = 0;
+  while ((c=fgetc(stdin)) != '\n') {
+    fileName[i++] = c;
   }
+  fileName[i] = '\0';
 
   mash(command1, command2, command3, fileName);
 
@@ -80,15 +86,13 @@ void mash(char c1[], char c2[], char c3[], char file[]) {
             char *str =strtok(c1, " ");
             int n = 0;
             while(str != NULL) {
-              //printf("%s\n", str);
                 myargs[n] = str;
                 str = strtok(NULL, " ");
                 n++;
             }
+            myargs[n] = strdup(file);
+            myargs[n+1] = NULL;
 
-            myargs[n+1] = strdup(file);
-            myargs[n+2] = NULL;
-            //printf("!!!%s\n",*myargs[2]);
             //test for invalid/execute
             if (execvp(myargs[0], myargs) == -1) {
                 printf("[SHELL 1] STATUS CODE = -1\n");
@@ -106,13 +110,12 @@ void mash(char c1[], char c2[], char c3[], char file[]) {
               char *str =strtok(c2, " ");
               int n = 0;
               while(str != NULL) {
-                printf("%s\n", str);
                   myargs[n] = strdup(str);
                   str = strtok(NULL, " ");
                   n++;
               }
-              myargs[n+1] = strdup(file);
-              myargs[n+2] = NULL;
+              myargs[n] = strdup(file);
+              myargs[n+1] = NULL;
               //test for invalid/execute
               if (execvp(myargs[0], myargs) == -1) {
                   printf("[SHELL 2] STATUS CODE = -1\n");
@@ -134,8 +137,8 @@ void mash(char c1[], char c2[], char c3[], char file[]) {
                     str = strtok(NULL, " ");
                     n++;
                 }
-                myargs[n+1] = strdup(file);
-                myargs[n+2] = NULL;
+                myargs[n] = strdup(file);
+                myargs[n+1] = NULL;
                 //test for invalid/execute
                 if (execvp(myargs[0], myargs) == -1) {
                     printf("[SHELL 3] STATUS CODE = -1\n");
