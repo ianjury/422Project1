@@ -27,9 +27,14 @@ int main(int argc, char const *argv[]) {
 
   //get first command
   printf("mash-1>");
-  if (fgets(buffer, sizeof buffer, stdin) != NULL) {
-    sscanf(buffer, "%s", command1);
+  int i = 0;
+  char c;
+  while ((c=fgetc(stdin)) != '\n') {
+    command1[i++] = c;
   }
+  command1[i] = '\0';
+  //fgets(command1, sizeof buffer, stdin);
+
 
   //get second command
   printf("mash-2>");
@@ -74,13 +79,16 @@ void mash(char c1[], char c2[], char c3[], char file[]) {
             char *myargs[5]; //5 is max # of args - as specified
             char *str =strtok(c1, " ");
             int n = 0;
-            while(str) {
-                myargs[n] = strdup(str);
+            while(str != NULL) {
+              //printf("%s\n", str);
+                myargs[n] = str;
                 str = strtok(NULL, " ");
                 n++;
             }
+
             myargs[n+1] = strdup(file);
             myargs[n+2] = NULL;
+            //printf("!!!%s\n",*myargs[2]);
             //test for invalid/execute
             if (execvp(myargs[0], myargs) == -1) {
                 printf("[SHELL 1] STATUS CODE = -1\n");
@@ -98,13 +106,13 @@ void mash(char c1[], char c2[], char c3[], char file[]) {
               char *str =strtok(c2, " ");
               int n = 0;
               while(str != NULL) {
+                printf("%s\n", str);
                   myargs[n] = strdup(str);
                   str = strtok(NULL, " ");
                   n++;
               }
               myargs[n+1] = strdup(file);
               myargs[n+2] = NULL;
-              printf("%s\n", *myargs);
               //test for invalid/execute
               if (execvp(myargs[0], myargs) == -1) {
                   printf("[SHELL 2] STATUS CODE = -1\n");
